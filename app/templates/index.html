@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeSense - AI Code Reviewer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col font-sans">
+    <header class="border-b border-gray-800 p-4">
+        <h1 class="text-2xl font-bold text-blue-500">CodeSense ⚡</h1>
+    </header>
+
+    <main class="flex-1 max-w-5xl w-full mx-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="flex flex-col gap-4">
+            <label for="code" class="text-sm font-semibold text-gray-300">Paste Code Below:</label>
+            <textarea id="code" rows="15" class="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-sm font-mono focus:outline-none focus:border-blue-500" placeholder="Paste your code here..."></textarea>
+            <button onclick="analyzeCode()" id="btn" class="bg-blue-600 hover:bg-blue-700 font-semibold py-2 rounded-lg transition-all">Analyze Code</button>
+        </div>
+
+        <div class="flex flex-col gap-4">
+            <h2 class="text-sm font-semibold text-gray-300">AI Analysis & Feedback:</h2>
+            <div id="output" class="bg-gray-800 border border-gray-700 rounded-lg p-4 h-[380px] overflow-y-auto text-sm whitespace-pre-wrap font-mono text-gray-300">
+                Submit code to receive automated feedback...
+            </div>
+        </div>
+    </main>
+
+    <script>
+        async function analyzeCode() {
+            const codeInput = document.getElementById('code').value;
+            const outputDiv = document.getElementById('output');
+            const btn = document.getElementById('btn');
+
+            if (!codeInput.trim()) {
+                outputDiv.innerText = "Please paste some code first!";
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "Analyzing...";
+            outputDiv.innerText = "Analyzing your code with AI...";
+
+            try {
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code: codeInput })
+                });
+
+                const data = await response.json();
+                outputDiv.innerText = data.analysis || data.error || "An error occurred.";
+            } catch (err) {
+                outputDiv.innerText = "Error: Failed to connect to server.";
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Analyze Code";
+            }
+        }
+    </script>
+</body>
+</html>
