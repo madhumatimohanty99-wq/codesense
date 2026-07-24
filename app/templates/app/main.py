@@ -8,7 +8,7 @@ from google import genai
 app = FastAPI()
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-templates = Jinja2Templates(directory=BASE_DIR)
+templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
 
 # Render Environment Variable se key uthayega
 client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
