@@ -28,35 +28,37 @@
 
     <script>
         async function analyzeCode() {
-            const codeInput = document.getElementById('code').value;
-            const outputDiv = document.getElementById('output');
-            const btn = document.getElementById('btn');
+    const codeInput = document.getElementById('code').value;
+    const outputDiv = document.getElementById('output');
+    const btn = document.getElementById('btn');
 
-            if (!codeInput.trim()) {
-                outputDiv.innerText = "Please paste some code first!";
-                return;
-            }
+    if (!codeInput.trim()) {
+        outputDiv.innerText = "Please paste some code first!";
+        return;
+    }
 
-            btn.disabled = true;
-            btn.innerText = "Analyzing...";
-            outputDiv.innerText = "Analyzing your code with AI...";
+    btn.disabled = true;
+    btn.innerText = "Analyzing...";
+    outputDiv.innerText = "Analyzing your code with AI...";
 
-            try {
-                const response = await fetch('/analyze', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ code: codeInput })
-                });
+    try {
+        const formData = new FormData();
+        formData.append('code', codeInput);
 
-                const data = await response.json();
-                outputDiv.innerText = data.analysis || data.error || "An error occurred.";
-            } catch (err) {
-                outputDiv.innerText = "Error: Failed to connect to server.";
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "Analyze Code";
-            }
-        }
+        const response = await fetch('/analyze', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+        outputDiv.innerText = data.analysis || data.error || "An error occurred.";
+    } catch (err) {
+        outputDiv.innerText = "Error: Failed to connect to server.";
+    } finally {
+        btn.disabled = false;
+        btn.innerText = "Analyze Code";
+    }
+}
     </script>
 </body>
 </html>
