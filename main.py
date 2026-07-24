@@ -32,8 +32,4 @@ async def analyze_code(request: Request, code: str = Form(...)):
     except Exception as e:
         result = f"Error generating analysis: {str(e)}"
 
-    return templates.TemplateResponse(
-        request=request,
-        name="index.html",
-        context={"result": result, "code": code}
-    )
+    return result
