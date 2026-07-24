@@ -25,7 +25,7 @@ async def read_root(request: Request):
 async def analyze_code(request: Request, code: str = Form(...)):
     try:
         response = client.models.generate_content(
-            model='gemini-2.5-flash',
+            model='gemini-1.5-flash',
             contents=f"Analyze this code and provide feedback/suggestions:\n\n{code}"
         )
         result = response.text
