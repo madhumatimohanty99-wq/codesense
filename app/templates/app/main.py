@@ -1,33 +1,34 @@
 import os
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
-from openai import OpenAI
+from google import genai
 
 app = FastAPI()
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-templates = Jinja2Templates(directory=os.path.dirname(BASE_DIR))
 
-client = OpenAI(api_key="sk-proj-abc123yourrealactualkeyhere...")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+templates = Jinja2Templates(directory=BASE_DIR)
+
+# Render Environment Variable se key uthayega
+client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 class CodeRequest(BaseModel):
     code: str
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
-   return templates.TemplateResponse(request, "index.html")
+    return templates.TemplateResponse("index.html", {"request": request})
 
 @app.post("/analyze")
-async def analyze_code(request: CodeRequest):
+async def analyze_code(request: Request, code: str = Form(...)):
     try:
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": "You are a senior developer analyzing code. Point out bugs, security risks, and optimization suggestions clearly."},
-                {"role": "user", "content": f"Analyze this code:\n\n{request.code}"}
-            ]
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=f"You are a senior developer analyzing code. Point out bugs, improvements, and best practices:\n\n{code}"
         )
-        return {"analysis": response.choices[0].message.content}
+        feedback = response.text
     except Exception as e:
-        return {"error": str(e)}
+        feedback = f"Error: {str(e)}"
+        
+    return templates.TemplateResponse("index.html", {"request": request, "feedback": feedback, "code": code})

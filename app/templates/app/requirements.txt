@@ -1,6 +1,6 @@
 fastapi
 uvicorn
 jinja2
-openai
+google-gemini
 pydantic
 gunicorn
