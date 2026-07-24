@@ -50,8 +50,8 @@
             body: formData
         });
 
-        const data = await response.json();
-        outputDiv.innerText = data.analysis || data.error || "An error occurred.";
+        const data = await response.text();
+        outputDiv.innerHTML = data;
     } catch (err) {
         outputDiv.innerText = "Error: Failed to connect to server.";
     } finally {
